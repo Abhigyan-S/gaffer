@@ -1034,7 +1034,7 @@ function deletePhase(i,e){
 // ═══════════════════════════════
 async function callAI(prompt){
   try{
-    const res=await fetch('GAFFER_API_URL',{
+    const res=await fetch('https://gaffer-proxy.abhigyan-singhal.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
