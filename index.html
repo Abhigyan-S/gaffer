@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Gaffer — The free AI-powered coaching platform for football coaches at every level. Tactics board, squad management, session planning, scouting and more.">
+<title>Gaffer — Coach smarter. Win more.</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0f1a;--bg2:#111827;--bg3:#1f2937;
+  --text:#f9fafb;--muted:#9ca3af;--border:#1f2937;
+  --green:#16a34a;--green2:#22c55e;
+  --accent:#facc15;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;line-height:1.6}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,15,26,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:60px;gap:32px}
+.nav-logo{font-size:22px;font-weight:800;color:var(--accent);letter-spacing:1px;text-decoration:none}
+.nav-links{display:flex;gap:24px;margin-left:auto;align-items:center}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#000;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:opacity .15s}
+.nav-cta:hover{opacity:.85;color:#000}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden}
+.hero-pitch{position:absolute;inset:0;opacity:.06}
+.hero-pitch svg{width:100%;height:100%;object-fit:cover}
+.hero-content{position:relative;max-width:760px}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:28px}
+.hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green2)}
+h1{font-size:clamp(36px,7vw,72px);font-weight:800;line-height:1.08;letter-spacing:-1px;margin-bottom:24px}
+h1 em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:clamp(16px,2.5vw,20px);color:var(--muted);max-width:540px;margin:0 auto 40px;line-height:1.7}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#000;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:700;text-decoration:none;transition:opacity .15s}
+.btn-primary:hover{opacity:.85;color:#000}
+.btn-ghost{padding:14px 32px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none;border:1px solid var(--border);color:var(--text);transition:background .15s}
+.btn-ghost:hover{background:var(--bg2)}
+.hero-note{margin-top:20px;font-size:13px;color:var(--muted)}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:48px;padding:48px 24px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-size:36px;font-weight:800;color:var(--accent)}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* FEATURES */
+.section{padding:80px 24px;max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--green2);margin-bottom:12px;font-weight:600}
+.section-title{font-size:clamp(28px,4vw,44px);font-weight:800;margin-bottom:16px;letter-spacing:-.5px}
+.section-sub{font-size:16px;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:48px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;transition:border-color .15s}
+.feature-card:hover{border-color:var(--green)}
+.feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px}
+.fi-green{background:#14532d}
+.fi-purple{background:#4c1d95}
+.fi-amber{background:#78350f}
+.fi-blue{background:#1e3a5f}
+.fi-red{background:#7f1d1d}
+.fi-teal{background:#134e4a}
+.fi-pink{background:#831843}
+.feature-title{font-size:17px;font-weight:700;margin-bottom:8px}
+.feature-desc{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* AUDIENCE */
+.audience-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.aud-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center}
+.aud-icon{font-size:40px;margin-bottom:16px}
+.aud-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.aud-desc{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;counter-reset:steps}
+.step{position:relative;padding:24px;background:var(--bg2);border-radius:14px;border:1px solid var(--border);counter-increment:steps}
+.step::before{content:counter(steps);position:absolute;top:-14px;left:20px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#000;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.step-title{font-size:15px;font-weight:700;margin-bottom:8px;margin-top:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* FAQ */
+.faq{max-width:700px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border);padding:20px 0}
+.faq-q{font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;user-select:none}
+.faq-q .arrow{font-size:18px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.faq-item.open .arrow{transform:rotate(90deg)}
+.faq-a{font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px;display:none}
+.faq-item.open .faq-a{display:block}
+
+/* CTA FOOTER */
+.cta-section{text-align:center;padding:80px 24px;background:var(--bg2);border-top:1px solid var(--border)}
+.cta-section h2{font-size:clamp(28px,4vw,44px);font-weight:800;margin-bottom:16px;letter-spacing:-.5px}
+.cta-section p{color:var(--muted);font-size:16px;margin-bottom:32px}
+
+footer{text-align:center;padding:24px;font-size:13px;color:var(--muted);border-top:1px solid var(--border)}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--text)}
+
+@media(max-width:600px){
+  .nav-links .hide-mobile{display:none}
+  .stats{gap:24px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">Gaffer</a>
+  <div class="nav-links">
+    <a href="#features" class="hide-mobile">Features</a>
+    <a href="#how" class="hide-mobile">How it works</a>
+    <a href="#faq">FAQ</a>
+    <a href="app.html" class="nav-cta">Open app</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-pitch">
+    <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <rect width="800" height="500" fill="#166534"/>
+      <rect x="40" y="30" width="720" height="440" fill="none" stroke="white" stroke-width="2"/>
+      <line x1="40" y1="250" x2="760" y2="250" stroke="white" stroke-width="1.5"/>
+      <circle cx="400" cy="250" r="70" fill="none" stroke="white" stroke-width="1.5"/>
+      <rect x="270" y="30" width="260" height="100" fill="none" stroke="white" stroke-width="1.5"/>
+      <rect x="270" y="370" width="260" height="100" fill="none" stroke="white" stroke-width="1.5"/>
+      <rect x="320" y="30" width="160" height="50" fill="none" stroke="white" stroke-width="1"/>
+      <rect x="320" y="420" width="160" height="50" fill="none" stroke="white" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="dot"></span>Free · AI-powered · Works anywhere</div>
+    <h1>The coaching platform<br>every <em>football coach</em><br>deserves.</h1>
+    <p class="hero-sub">Tactics board, squad management, session planning, scouting, and AI analysis — all in one free tool. Built for coaches at every level, everywhere in the world.</p>
+    <div class="hero-btns">
+      <a href="app.html" class="btn-primary">Open Gaffer — it's free</a>
+      <a href="#how" class="btn-ghost">See how it works</a>
+    </div>
+    <p class="hero-note">No sign-up required. No download. Works on iPad, tablet, laptop, and phone.</p>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">Coaching modules</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free, forever</div></div>
+  <div class="stat"><div class="stat-num">0</div><div class="stat-label">Downloads needed</div></div>
+  <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Formations supported</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-label">What's inside</div>
+  <h2 class="section-title">Everything a coach needs.<br>Nothing they don't.</h2>
+  <p class="section-sub">Pro coaching software costs hundreds a month. Gaffer is free, runs in any browser, and is built around the real problems coaches face every day.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-green">⬜</div>
+      <div class="feature-title">Tactics board</div>
+      <div class="feature-desc">Drag and drop players freely on a full or half pitch. Draw pass arrows and run lines. Add opponents. Save multiple phases to walk your team through a play step by step.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-purple">🧠</div>
+      <div class="feature-title">AI coach assistant</div>
+      <div class="feature-desc">Get formation analysis, drill suggestions, pre-match team talks, and set piece ideas — all generated by AI that understands your formation and context.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-blue">👥</div>
+      <div class="feature-title">Squad manager</div>
+      <div class="feature-desc">Track every player's availability, fitness, position, and notes. Get AI-suggested lineups based on who is fit and available for matchday.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-amber">📋</div>
+      <div class="feature-title">Session planner</div>
+      <div class="feature-desc">Build complete training sessions with warm-up, technical, tactical, game, and cooldown blocks. Or let AI generate a full session from your focus area.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-red">📊</div>
+      <div class="feature-title">Match log</div>
+      <div class="feature-desc">Log goals, cards, subs, and notes live during the match. Track your season record. Get an AI post-match summary after the final whistle.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-teal">🔍</div>
+      <div class="feature-title">Scouting tool</div>
+      <div class="feature-desc">Enter your observations about the opponent — formation, style, danger players — and AI builds a full scout report and tactical game plan. No expensive data needed.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-green">📈</div>
+      <div class="feature-title">Player development</div>
+      <div class="feature-desc">Rate each player across 10 skills. Add coach notes. Get AI-generated personalised development plans with specific training exercises for their weaknesses.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-pink">🔗</div>
+      <div class="feature-title">Share views</div>
+      <div class="feature-desc">Three views for three audiences. Coaches get full tactical detail. Players get their role explained simply. Parents get plain English with no jargon.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="section">
+  <div class="section-label">Who it's for</div>
+  <h2 class="section-title">Built for everyone<br>involved in the game.</h2>
+  <p class="section-sub">Gaffer works for coaches at any level — grassroots, academy, amateur, or semi-professional — and gives players and parents their own view too.</p>
+  <div class="audience-grid">
+    <div class="aud-card">
+      <div class="aud-icon">📋</div>
+      <div class="aud-title">Coaches</div>
+      <div class="aud-desc">Full tactical control. AI analysis. Session planning. Squad management. Everything from your first training session to matchday in one place.</div>
+    </div>
+    <div class="aud-card">
+      <div class="aud-icon">👟</div>
+      <div class="aud-title">Players</div>
+      <div class="aud-desc">Understand your role in the formation. See exactly where to run, when to press, and what your coach expects from you in plain language.</div>
+    </div>
+    <div class="aud-card">
+      <div class="aud-icon">👨‍👩‍👦</div>
+      <div class="aud-title">Parents</div>
+      <div class="aud-desc">Finally understand what's happening on the pitch. Get a simple explanation of the formation and what your child's role is — no football knowledge required.</div>
+    </div>
+    <div class="aud-card">
+      <div class="aud-icon">🏟️</div>
+      <div class="aud-title">Clubs</div>
+      <div class="aud-desc">Give every coach in your club access to the same professional-grade tools. Standardise your coaching methodology without paying for expensive software.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Open it. Use it.<br>That's it.</h2>
+  <p class="section-sub">No account. No download. No subscription. Gaffer runs entirely in your browser.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-title">Open Gaffer in your browser</div>
+      <div class="step-desc">Works on iPad, Android tablet, laptop, desktop, and mobile. No app store required.</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Pick a formation or build your own</div>
+      <div class="step-desc">Choose from 8 preset formations or drag players freely to create any shape you want.</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Draw your tactics</div>
+      <div class="step-desc">Add pass arrows, run lines, and opponent markers. Save multiple phases to show the full play.</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Ask the AI coach</div>
+      <div class="step-desc">Get instant analysis, drill suggestions, team talks, scout reports, and development plans.</div>
+    </div>
+    <div class="step">
+      <div class="step-title">Share with your team</div>
+      <div class="step-desc">Save as an image or show players and parents their own tailored view directly on screen.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title">Common questions.</h2>
+  <p class="section-sub" style="margin-bottom:32px">Everything you need to know before you start.</p>
+  <div class="faq">
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is Gaffer really free? <span class="arrow">›</span></div>
+      <div class="faq-a">Yes, completely free. No subscription, no hidden costs, no premium tier. Gaffer is open-source and hosted on GitHub Pages. You can even download the file and run it offline.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Do I need to create an account? <span class="arrow">›</span></div>
+      <div class="faq-a">No account needed. Open the app and start using it immediately. Your squad and session data is stored in your browser's local storage, so it persists between visits without needing a login.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Does it work on iPad and tablets? <span class="arrow">›</span></div>
+      <div class="faq-a">Yes. Gaffer is fully touch-optimised. Drag players with your finger, tap to switch modes, and use it in the dressing room on any iPad or Android tablet. It also works perfectly on laptops and desktops.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How does the AI work? <span class="arrow">›</span></div>
+      <div class="faq-a">Gaffer uses Claude (by Anthropic) for all AI features. When you ask for a formation analysis, team talk, scout report, or development plan, it sends your inputs to Claude and displays the response. The AI understands football tactics at a high level and is tuned for grassroots coaching contexts.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I use it offline? <span class="arrow">›</span></div>
+      <div class="faq-a">The tactics board, squad manager, session planner, and match log all work offline. The AI features (formation analysis, team talks, scout reports, etc.) require an internet connection since they call the AI API.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I draw pass arrows and run lines? <span class="arrow">›</span></div>
+      <div class="faq-a">Switch to "Pass arrow" or "Run line" mode using the buttons at the bottom of the tactics board. Then tap and drag from any point on the pitch to draw the line. Yellow solid arrows are passes, blue dashed lines are player runs. Switch back to "Select" mode to drag players again.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I edit a player's shirt number or name? <span class="arrow">›</span></div>
+      <div class="faq-a">In Select mode, double-tap (or double-click) any player circle to edit their number or name. On tablet you can also long-press to get a context menu with options to edit, switch team colour, or remove the player.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What are phases and how do I use them? <span class="arrow">›</span></div>
+      <div class="faq-a">Phases let you save multiple board states as steps in a play. Set up your first tactical shape, tap "Save phase" and name it (e.g. "Press trigger"). Then move players into the next position, save again as "After press", and so on. During team meetings, tap through the phases to walk your players through the full sequence.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Does the scouting tool need stats data? <span class="arrow">›</span></div>
+      <div class="faq-a">No. That's the point. You just type what you observe — their formation, playing style, danger players, strengths and weaknesses — and the AI turns it into a full tactical breakdown and game plan. No Opta data, no subscriptions, no access to professional analytics required.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I save my tactics as an image to share with players? <span class="arrow">›</span></div>
+      <div class="faq-a">Yes. Hit "Save image" in the tactics toolbar and it downloads the current pitch as a PNG. You can then WhatsApp it to your players, print it, or use it in a presentation.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is the code open source? <span class="arrow">›</span></div>
+      <div class="faq-a">Yes. The full source is on GitHub. You can fork it, modify it, run it locally, or contribute to it. Pull requests are welcome.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to coach smarter?</h2>
+  <p>Free. No account. Works on any device. Open it right now.</p>
+  <a href="app.html" class="btn-primary" style="font-size:18px;padding:16px 40px">Open Gaffer</a>
+</section>
+
+<footer>
+  <p>Gaffer · Free and open source · <a href="https://github.com" target="_blank">GitHub</a> · Built for coaches everywhere</p>
+</footer>
+
+<script>
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  item.classList.toggle('open');
+}
+</script>
+</body>
+</html>
