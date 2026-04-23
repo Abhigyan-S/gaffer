@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gaffer — Coaching Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#334155;
+  --text:#f1f5f9;--muted:#94a3b8;--border:#334155;
+  --accent:#facc15;--green:#166534;--red:#ef4444;--blue:#3b82f6;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;user-select:none}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;width:200px;height:100%;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50;transition:transform .25s}
+#nav-logo{padding:16px;border-bottom:1px solid var(--border)}
+#nav-logo .name{font-size:20px;font-weight:800;color:var(--accent)}
+#nav-logo .tag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+#nav-logo a{font-size:11px;color:var(--muted);text-decoration:none;display:block;margin-bottom:8px}
+.nsec{padding:10px 12px 4px;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.nitem{display:flex;align-items:center;gap:8px;padding:9px 14px;margin:2px 8px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .15s}
+.nitem:hover{background:var(--bg3);color:var(--text)}
+.nitem.on{background:var(--accent);color:#000}
+#nav-foot{margin-top:auto;padding:12px;font-size:11px;color:var(--muted);text-align:center;border-top:1px solid var(--border)}
+
+/* MOBILE */
+#hamburger{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer;color:var(--text);font-size:18px;line-height:1}
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+
+/* MAIN */
+#main{position:fixed;top:0;left:200px;right:0;bottom:0;overflow:hidden}
+.page{display:none;height:100%;flex-direction:column;overflow-y:auto}
+.page.on{display:flex}
+
+/* SHARED */
+.btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;font-family:inherit}
+.btn:hover{background:var(--border)}
+.btn.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.btn.sm{height:30px;padding:0 10px;font-size:12px}
+.btn.danger{color:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:var(--red);color:#fff}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.ctitle{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.ph{padding:16px}
+.phead{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--bg2)}
+.phead-title{font-size:17px;font-weight:700}
+.phead-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ml-auto{margin-left:auto}
+input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.fg{margin-bottom:12px}
+.badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.bg{background:#14532d;color:#86efac}
+.by{background:#713f12;color:#fde047}
+.br{background:#7f1d1d;color:#fca5a5}
+.ai-box{background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;line-height:1.8;min-height:60px;color:var(--text)}
+.ai-box em{color:var(--muted);font-style:italic}
+.tag{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .15s;margin:2px}
+.tag.on{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* TACTICS PAGE */
+#page-tactics{background:#0d1117;overflow:hidden}
+#tb{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+#pb{display:flex;align-items:center;gap:6px;padding:5px 12px;background:#070c14;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;min-height:38px}
+#pb::-webkit-scrollbar{display:none}
+.pchip{height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.pchip.on{background:var(--accent);color:#000;border-color:var(--accent)}
+#tmain{display:flex;flex:1;min-height:0}
+#pwrap{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;min-height:0;overflow:hidden}
+canvas{display:block;touch-action:none}
+#aip{width:270px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column}
+#aip-head{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--accent)}
+#aip-body{flex:1;overflow-y:auto;padding:12px;font-size:13px;line-height:1.8;color:var(--muted)}
+#aip-btns{padding:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+#aip-ask{padding:8px;border-top:1px solid var(--border);display:flex;gap:6px}
+#aip-ask input{flex:1}
+#mbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+#mbar-hint{margin-left:auto;font-size:11px;color:var(--muted)}
+
+/* TOGGLE */
+.tgl{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.tgl-sw{position:relative;width:32px;height:18px;flex-shrink:0}
+.tgl-sw input{opacity:0;width:0;height:0;position:absolute}
+.tgl-track{position:absolute;inset:0;background:var(--bg3);border-radius:9px;cursor:pointer;transition:background .2s}
+.tgl-sw input:checked+.tgl-track{background:var(--accent)}
+.tgl-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
+.tgl-sw input:checked~.tgl-thumb{transform:translateX(14px)}
+
+/* CONTEXT MENU */
+#ctx{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;z-index:999;display:none;flex-direction:column;gap:2px;box-shadow:0 8px 32px rgba(0,0,0,.7);min-width:160px}
+#ctx.on{display:flex}
+.citem{padding:8px 12px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--text);transition:background .1s}
+.citem:hover{background:var(--bg3)}
+.citem.red{color:var(--red)}
+
+/* EDIT POPUP */
+#epop{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;z-index:999;display:none;flex-direction:column;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.8);min-width:220px;left:50%;top:40%;transform:translate(-50%,-50%)}
+#epop.on{display:flex}
+
+/* TOAST */
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-size:12px;color:var(--muted);z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+#toast.on{opacity:1}
+
+/* SQUAD */
+.sq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;padding:16px}
+.sq-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.sq-card:hover{border-color:var(--accent)}
+.sq-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;margin-bottom:8px}
+
+/* SESSION */
+.sw{display:flex;gap:12px;padding:16px;height:100%}
+.sl{width:250px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.sr{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.sb{border-radius:10px;padding:12px;border-left:3px solid}
+.sb.wu{background:#1c1f0a;border-color:#84cc16}
+.sb.te{background:#0a1929;border-color:#3b82f6}
+.sb.ta{background:#1a0f29;border-color:#a855f7}
+.sb.ga{background:#0f1f10;border-color:#22c55e}
+.sb.re{background:#1a1200;border-color:#facc15}
+
+/* MATCH */
+.mh{display:flex;align-items:center;justify-content:center;gap:20px;padding:20px;background:var(--bg2);margin:16px;border-radius:12px;border:1px solid var(--border)}
+.mt{text-align:center;flex:1}
+.ms{font-size:48px;font-weight:800;color:var(--accent)}
+.ev{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);font-size:13px;margin-bottom:6px}
+.et{font-weight:700;color:var(--accent);min-width:30px}
+
+/* SCOUTING */
+.sc2{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+
+/* DEV */
+.stars{display:flex;gap:4px}
+.star{font-size:20px;cursor:pointer}
+
+/* AUDIENCE TABS */
+.atabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.atab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.atab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.apane{display:none;padding:20px;flex:1;overflow-y:auto}
+.apane.on{display:block}
+
+@media(max-width:768px){
+  #nav{transform:translateX(-200px)}
+  #nav.on{transform:translateX(0)}
+  #hamburger{display:flex;align-items:center;justify-content:center}
+  #overlay.on{display:block}
+  #main{left:0}
+  #aip{display:none}
+  .sc2{grid-template-columns:1fr}
+  .sw{flex-direction:column}
+  .sl{width:100%}
+}
+</style>
+</head>
+<body>
+
+<button id="hamburger" onclick="toggleNav()">☰</button>
+<div id="overlay" onclick="toggleNav()"></div>
+
+<nav id="nav">
+  <div id="nav-logo">
+    <a href="index.html">← Back to home</a>
+    <div class="name">Gaffer</div>
+    <div class="tag">Coaching Platform</div>
+  </div>
+  <div class="nsec">Match Day</div>
+  <div class="nitem on" onclick="showPage('tactics',this)">⬛ Tactics Board</div>
+  <div class="nitem" onclick="showPage('matchlog',this)">📋 Match Log</div>
+  <div class="nsec">Team</div>
+  <div class="nitem" onclick="showPage('squad',this)">👥 Squad Manager</div>
+  <div class="nitem" onclick="showPage('dev',this)">📈 Player Development</div>
+  <div class="nsec">Training</div>
+  <div class="nitem" onclick="showPage('session',this)">📅 Session Planner</div>
+  <div class="nsec">Analysis</div>
+  <div class="nitem" onclick="showPage('scouting',this)">🔍 Scouting</div>
+  <div class="nsec">Share</div>
+  <div class="nitem" onclick="showPage('audience',this)">🔗 Share Views</div>
+  <div id="nav-foot">v1.0 · Free forever</div>
+</nav>
+
+<div id="main">
+
+<!-- ═══ TACTICS BOARD ═══ -->
+<div class="page on" id="page-tactics">
+  <div id="tb">
+    <select id="fsel" class="btn" style="padding:0 10px;cursor:pointer" onchange="loadFormation(this.value);this.value=''">
+      <option value="">Formation...</option>
+      <option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option>
+      <option value="4-2-3-1">4-2-3-1</option><option value="3-5-2">3-5-2</option>
+      <option value="5-3-2">5-3-2</option><option value="4-1-4-1">4-1-4-1</option>
+      <option value="3-4-3">3-4-3</option><option value="4-5-1">4-5-1</option>
+      <option value="custom">Clear pitch</option>
+    </select>
+    <div style="width:1px;height:24px;background:var(--border)"></div>
+    <div class="tgl">
+      Num
+      <label class="tgl-sw"><input type="checkbox" id="lbltgl" onchange="T.showPos=this.checked;redraw()"><span class="tgl-track"></span><span class="tgl-thumb"></span></label>
+      Pos
+    </div>
+    <div style="width:1px;height:24px;background:var(--border)"></div>
+    <button class="btn sm" onclick="undo()">↩ Undo</button>
+    <button class="btn sm" onclick="clearArrows()">Clear lines</button>
+    <button class="btn sm" id="halfbtn" onclick="toggleHalf()">½ Pitch</button>
+    <button class="btn sm on" onclick="saveImg()">Save image</button>
+  </div>
+  <div id="pb">
+    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;flex-shrink:0">Phases:</span>
+    <div id="pchips" style="display:flex;gap:4px;flex-wrap:nowrap"></div>
+    <button class="btn sm" onclick="savePhase()">+ Save phase</button>
+  </div>
+  <div id="tmain">
+    <div id="pwrap"><canvas id="C"></canvas></div>
+    <div id="aip">
+      <div id="aip-head">🟡 AI Coach</div>
+      <div id="aip-body"><em>Set up your formation then ask the AI coach for analysis...</em></div>
+      <div id="aip-btns">
+        <button class="btn sm" onclick="aiDo('analyse')">Analyse shape</button>
+        <button class="btn sm" onclick="aiDo('drills')">Suggest drills</button>
+        <button class="btn sm" onclick="aiDo('teamtalk')">Team talk</button>
+        <button class="btn sm" onclick="aiDo('setpiece')">Set pieces</button>
+      </div>
+      <div id="aip-ask">
+        <input type="text" id="aiQ" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')aiAsk()">
+        <button class="btn sm on" onclick="aiAsk()">Ask</button>
+      </div>
+    </div>
+  </div>
+  <div id="mbar">
+    <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Mode:</span>
+    <button class="btn on" id="m-select" onclick="setMode('select',this)">↖ Select</button>
+    <button class="btn" id="m-pass" onclick="setMode('pass',this)">→ Pass arrow</button>
+    <button class="btn" id="m-run" onclick="setMode('run',this)">⋯ Run line</button>
+    <button class="btn" id="m-opp" onclick="setMode('opp',this)">🔴 Add opponent</button>
+    <span id="mbar-hint">Drag players to move them</span>
+  </div>
+</div>
+
+<!-- ═══ SQUAD ═══ -->
+<div class="page" id="page-squad">
+  <div class="phead">
+    <div><div class="phead-title">Squad Manager</div><div class="phead-sub">Manage players and availability</div></div>
+    <div class="ml-auto" style="display:flex;gap:8px">
+      <button class="btn" onclick="addPlayer()">+ Add player</button>
+      <button class="btn" onclick="aiLineup()">AI lineup</button>
+    </div>
+  </div>
+  <div style="padding:10px 16px;display:flex;gap:6px;border-bottom:1px solid var(--border)">
+    <button class="tag on" onclick="filterSq('all',this)">All</button>
+    <button class="tag" onclick="filterSq('fit',this)">Fit</button>
+    <button class="tag" onclick="filterSq('doubt',this)">Doubt</button>
+    <button class="tag" onclick="filterSq('out',this)">Out</button>
+  </div>
+  <div id="sq-grid" class="sq-grid"></div>
+  <div class="ph"><div class="card"><div class="ctitle">AI Lineup Suggestion</div><div id="sq-ai" class="ai-box"><em>Tap "AI lineup" to get a suggested starting 11...</em></div></div></div>
+</div>
+
+<!-- ═══ SESSION ═══ -->
+<div class="page" id="page-session">
+  <div class="phead">
+    <div><div class="phead-title">Session Planner</div><div class="phead-sub">Build training sessions</div></div>
+    <div class="ml-auto" style="display:flex;gap:8px">
+      <button class="btn" onclick="aiSession()">AI generate</button>
+      <button class="btn on" onclick="toast('Session saved!')">Save session</button>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="sl">
+      <div class="card">
+        <div class="ctitle">Session details</div>
+        <div class="fg"><label>Session name</label><input id="sname" type="text" placeholder="e.g. Pressing triggers"></div>
+        <div class="fg"><label>Focus</label><select id="sfocus"><option>Defending</option><option>Attacking</option><option>Pressing</option><option>Set pieces</option><option>Fitness</option><option>Skills</option></select></div>
+        <div class="fg"><label>Duration (mins)</label><input id="sdur" type="number" value="90"></div>
+        <div class="fg"><label>Players</label><input id="splayers" type="number" value="16"></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">Add drill</div>
+        <div class="fg"><label>Type</label><select id="dtype"><option value="wu">Warm-up</option><option value="te">Technical</option><option value="ta">Tactical</option><option value="ga">Small-sided game</option><option value="re">Cooldown</option></select></div>
+        <div class="fg"><label>Drill name</label><input id="dname" type="text" placeholder="e.g. Rondo 4v2"></div>
+        <div class="fg"><label>Duration (mins)</label><input id="ddur" type="number" value="15"></div>
+        <div class="fg"><label>Notes</label><textarea id="dnotes" rows="2" placeholder="Key coaching points..."></textarea></div>
+        <button class="btn on" style="width:100%" onclick="addDrill()">Add block</button>
+      </div>
+    </div>
+    <div class="sr">
+      <div class="card"><div class="ctitle">AI Session Plan</div><div id="ses-ai" class="ai-box"><em>Tap "AI generate" for a complete session plan...</em></div></div>
+      <div id="drills-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MATCH LOG ═══ -->
+<div class="page" id="page-matchlog">
+  <div class="phead">
+    <div><div class="phead-title">Match Log</div><div class="phead-sub">Record match events live</div></div>
+    <div class="ml-auto"><button class="btn on" onclick="newMatch()">+ New match</button></div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="mh">
+      <div class="mt"><div style="font-size:16px;font-weight:700" id="mhome">My Team</div><div style="font-size:11px;color:var(--muted)">Home</div></div>
+      <div style="text-align:center">
+        <div style="display:flex;align-items:center;gap:16px"><span class="ms" id="sh">0</span><span style="color:var(--muted)">-</span><span class="ms" id="sa">0</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px" id="mstat">Pre-match</div>
+      </div>
+      <div class="mt"><div style="font-size:16px;font-weight:700" id="maway">Opponents</div><div style="font-size:11px;color:var(--muted)">Away</div></div>
+    </div>
+    <div style="padding:0 16px 10px;display:flex;gap:6px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px;width:100%;margin-bottom:6px">
+        <label style="white-space:nowrap;width:auto">Minute:</label><input type="number" id="mmin" value="1" min="1" max="120" style="width:70px">
+        <label style="white-space:nowrap;width:auto">Player:</label><input type="text" id="mplayer" placeholder="Name/#" style="flex:1;max-width:180px">
+      </div>
+      <button class="btn" onclick="logEv('⚽','Goal',true)">⚽ Our goal</button>
+      <button class="btn" onclick="logEv('⚽','Goal conceded',false)">⚽ Their goal</button>
+      <button class="btn" onclick="logEv('🟨','Yellow card',null)">🟨 Yellow</button>
+      <button class="btn" onclick="logEv('🟥','Red card',null)">🟥 Red</button>
+      <button class="btn" onclick="logEv('🔄','Substitution',null)">🔄 Sub</button>
+      <button class="btn" onclick="logEv('🩹','Injury',null)">🩹 Injury</button>
+    </div>
+    <div id="evlist" style="padding:0 16px"></div>
+    <div class="ph"><div class="card"><div class="ctitle">Post-match AI Summary</div><div id="match-ai" class="ai-box"><em>Tap after the match for AI analysis...</em></div><button class="btn sm" style="margin-top:10px" onclick="aiMatch()">Generate summary</button></div></div>
+  </div>
+</div>
+
+<!-- ═══ SCOUTING ═══ -->
+<div class="page" id="page-scouting">
+  <div class="phead">
+    <div><div class="phead-title">Scouting</div><div class="phead-sub">Analyse opponents with AI</div></div>
+    <div class="ml-auto"><button class="btn on" onclick="aiScout()">AI scout report</button></div>
+  </div>
+  <div class="sc2">
+    <div class="card">
+      <div class="ctitle">Opponent details</div>
+      <div class="fg"><label>Team name</label><input id="oname" type="text" placeholder="e.g. City United FC"></div>
+      <div class="fg"><label>Their formation</label><select id="oform"><option>4-3-3</option><option>4-4-2</option><option>4-2-3-1</option><option>3-5-2</option><option>Unknown</option></select></div>
+      <div class="fg"><label>Playing style</label><select id="ostyle"><option>High press</option><option>Low block</option><option>Counter attack</option><option>Possession</option><option>Long ball</option><option>Unknown</option></select></div>
+      <div class="fg"><label>Their strengths</label><textarea id="ostr" rows="3" placeholder="e.g. Quick wingers, strong in the air..."></textarea></div>
+      <div class="fg"><label>Their weaknesses</label><textarea id="oweak" rows="3" placeholder="e.g. Slow to track back, poor keeper distribution..."></textarea></div>
+      <div class="fg"><label>Danger players</label><textarea id="odanger" rows="2" placeholder="e.g. No.10 drives inside from left..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">AI Scout Report</div>
+      <div id="scout-ai" class="ai-box" style="min-height:200px"><em>Fill in opponent details and tap "AI scout report"...</em></div>
+      <div style="margin-top:16px">
+        <div class="ctitle">Watchlist</div>
+        <div id="watchlist"></div>
+        <div style="display:flex;gap:6px;margin-top:8px"><input id="wname" type="text" placeholder="Player name"><button class="btn sm" onclick="addWatch()">Add</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PLAYER DEV ═══ -->
+<div class="page" id="page-dev">
+  <div class="phead"><div><div class="phead-title">Player Development</div><div class="phead-sub">Track and develop each player</div></div></div>
+  <div style="padding:12px 16px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border)" id="dev-tabs"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;overflow-y:auto" id="dev-content">
+    <div class="card"><div class="ctitle">Skill ratings</div><div id="dev-ratings"></div></div>
+    <div class="card">
+      <div class="ctitle">Coach notes</div>
+      <textarea id="dev-notes" rows="5" placeholder="Training notes, observations..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn sm on" onclick="saveDev()">Save</button>
+        <button class="btn sm" onclick="aiDev()">AI feedback</button>
+      </div>
+      <div id="dev-ai" class="ai-box" style="margin-top:12px"><em>Save notes and tap "AI feedback"...</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUDIENCE ═══ -->
+<div class="page" id="page-audience">
+  <div class="phead">
+    <div><div class="phead-title">Share Views</div><div class="phead-sub">Explain tactics to players and parents</div></div>
+    <div class="ml-auto"><select id="aud-form" class="btn" style="padding:0 10px" onchange="loadAudience()"><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option><option value="4-2-3-1">4-2-3-1</option><option value="3-5-2">3-5-2</option></select></div>
+  </div>
+  <div class="atabs">
+    <div class="atab on" onclick="switchAud('coach',this)">Coach</div>
+    <div class="atab" onclick="switchAud('player',this)">Player</div>
+    <div class="atab" onclick="switchAud('parent',this)">Parent</div>
+  </div>
+  <div class="apane on" id="ap-coach"><div class="card"><div class="ctitle">Coach tactical breakdown</div><div id="aud-coach" class="ai-box"><em>Loading...</em></div></div></div>
+  <div class="apane" id="ap-player">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="aud-pos-btns"></div>
+    <div class="card"><div id="aud-player" class="ai-box"><em>Select your position above...</em></div></div>
+  </div>
+  <div class="apane" id="ap-parent">
+    <div class="card"><div class="ctitle">For parents — plain English</div><div id="aud-parent" class="ai-box"><em>Loading...</em></div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn sm" onclick="aiParent('watch')">What to watch for</button>
+      <button class="btn sm" onclick="aiParent('child')">My child's role</button>
+    </div></div>
+  </div>
+</div>
+
+</div><!-- end #main -->
+
+<!-- CONTEXT MENU -->
+<div id="ctx">
+  <div class="citem" onclick="ctxEdit()">✏️ Edit number / name</div>
+  <div class="citem" onclick="ctxSwitch()">🔄 Switch colour</div>
+  <div class="citem red" onclick="ctxRemove()">🗑 Remove</div>
+</div>
+
+<!-- EDIT POPUP -->
+<div id="epop">
+  <label>Shirt number or name</label>
+  <input type="text" id="epop-in" maxlength="12" placeholder="e.g. 7 or Ravi">
+  <div style="display:flex;gap:8px">
+    <button class="btn" style="flex:1" onclick="closeEpop()">Cancel</button>
+    <button class="btn on" style="flex:1" onclick="saveEpop()">Save</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// FORMATIONS
+// ═══════════════════════════════════════════
+const FORMS={
+  '4-3-3':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RB',x:.82,y:.77},{n:'5',p:'CB',x:.62,y:.80},{n:'6',p:'CB',x:.38,y:.80},{n:'3',p:'LB',x:.18,y:.77},{n:'8',p:'CM',x:.72,y:.58},{n:'4',p:'CM',x:.50,y:.55},{n:'11',p:'CM',x:.28,y:.58},{n:'7',p:'RW',x:.82,y:.32},{n:'9',p:'ST',x:.50,y:.27},{n:'10',p:'LW',x:.18,y:.32}],
+  '4-4-2':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RB',x:.82,y:.77},{n:'5',p:'CB',x:.62,y:.80},{n:'6',p:'CB',x:.38,y:.80},{n:'3',p:'LB',x:.18,y:.77},{n:'7',p:'RM',x:.85,y:.55},{n:'8',p:'CM',x:.62,y:.55},{n:'4',p:'CM',x:.38,y:.55},{n:'11',p:'LM',x:.15,y:.55},{n:'9',p:'ST',x:.62,y:.25},{n:'10',p:'ST',x:.38,y:.25}],
+  '4-2-3-1':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RB',x:.82,y:.77},{n:'5',p:'CB',x:.62,y:.80},{n:'6',p:'CB',x:.38,y:.80},{n:'3',p:'LB',x:.18,y:.77},{n:'4',p:'DM',x:.60,y:.62},{n:'8',p:'DM',x:.40,y:.62},{n:'7',p:'AM',x:.80,y:.42},{n:'10',p:'CAM',x:.50,y:.38},{n:'11',p:'AM',x:.20,y:.42},{n:'9',p:'ST',x:.50,y:.20}],
+  '3-5-2':[{n:'1',p:'GK',x:.50,y:.92},{n:'5',p:'CB',x:.70,y:.78},{n:'6',p:'CB',x:.50,y:.80},{n:'4',p:'CB',x:.30,y:.78},{n:'2',p:'RWB',x:.88,y:.58},{n:'8',p:'CM',x:.65,y:.55},{n:'10',p:'CM',x:.50,y:.52},{n:'11',p:'CM',x:.35,y:.55},{n:'3',p:'LWB',x:.12,y:.58},{n:'9',p:'ST',x:.62,y:.25},{n:'7',p:'ST',x:.38,y:.25}],
+  '5-3-2':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RWB',x:.90,y:.70},{n:'5',p:'CB',x:.70,y:.78},{n:'6',p:'CB',x:.50,y:.81},{n:'4',p:'CB',x:.30,y:.78},{n:'3',p:'LWB',x:.10,y:.70},{n:'8',p:'CM',x:.70,y:.52},{n:'7',p:'CM',x:.50,y:.49},{n:'11',p:'CM',x:.30,y:.52},{n:'9',p:'ST',x:.62,y:.26},{n:'10',p:'ST',x:.38,y:.26}],
+  '4-1-4-1':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RB',x:.82,y:.78},{n:'5',p:'CB',x:.62,y:.81},{n:'6',p:'CB',x:.38,y:.81},{n:'3',p:'LB',x:.18,y:.78},{n:'4',p:'DM',x:.50,y:.63},{n:'7',p:'RM',x:.85,y:.45},{n:'8',p:'CM',x:.62,y:.44},{n:'10',p:'CM',x:.38,y:.44},{n:'11',p:'LM',x:.15,y:.45},{n:'9',p:'ST',x:.50,y:.22}],
+  '3-4-3':[{n:'1',p:'GK',x:.50,y:.92},{n:'5',p:'CB',x:.70,y:.79},{n:'6',p:'CB',x:.50,y:.81},{n:'4',p:'CB',x:.30,y:.79},{n:'2',p:'RM',x:.85,y:.56},{n:'8',p:'CM',x:.62,y:.55},{n:'10',p:'CM',x:.38,y:.55},{n:'3',p:'LM',x:.15,y:.56},{n:'7',p:'RW',x:.80,y:.28},{n:'9',p:'ST',x:.50,y:.24},{n:'11',p:'LW',x:.20,y:.28}],
+  '4-5-1':[{n:'1',p:'GK',x:.50,y:.92},{n:'2',p:'RB',x:.82,y:.78},{n:'5',p:'CB',x:.62,y:.81},{n:'6',p:'CB',x:.38,y:.81},{n:'3',p:'LB',x:.18,y:.78},{n:'7',p:'RM',x:.90,y:.53},{n:'8',p:'CM',x:.68,y:.52},{n:'4',p:'CM',x:.50,y:.50},{n:'10',p:'CM',x:.32,y:.52},{n:'11',p:'LM',x:.10,y:.53},{n:'9',p:'ST',x:.50,y:.24}],
+};
+
+// ═══════════════════════════════════════════
+// TACTICS STATE
+// ═══════════════════════════════════════════
+const T={
+  mode:'select',
+  showPos:false,
+  half:false,
+  players:[],
+  arrows:[],
+  phases:[],
+  history:[],
+  drag:null,        // player being dragged
+  dragOX:0,dragOY:0,// offset when drag started
+  downX:0,downY:0,  // where pointer went down
+  moved:false,      // did pointer actually move?
+  arrowFrom:null,   // {x,y} start of arrow draw
+  arrowTo:null,     // {x,y} current end
+  ctxP:null,        // player targeted by context menu
+  epopP:null,       // player in edit popup
+  lastTapId:null,
+  lastTapTime:0,
+};
+
+let PW=0,PH=0,PR=18;
+const canvas=document.getElementById('C');
+const cx=canvas.getContext('2d');
+
+// ── Resize ──
+function resize(){
+  const wrap=document.getElementById('pwrap');
+  const W=wrap.clientWidth-20;
+  const H=wrap.clientHeight-20;
+  const ratio=T.half?68/52:68/105;
+  let w=W,h=W/ratio;
+  if(h>H){h=H;w=h*ratio;}
+  PW=Math.floor(w); PH=Math.floor(h);
+  canvas.width=PW; canvas.height=PH;
+  // CRITICAL: CSS size must equal pixel size so click coords are correct
+  canvas.style.width=PW+'px';
+  canvas.style.height=PH+'px';
+  PR=Math.max(14,Math.min(22,PW*0.038));
+  redraw();
+}
+
+// ── Coords ──
+// Convert fraction → canvas px
+function tc(fx,fy){return{x:fx*PW,y:fy*PH}}
+// Convert canvas px → fraction
+function tf(px,py){return{x:px/PW,y:py/PH}}
+// Get canvas px from ANY event type (mouse, pointer, touch)
+function ep(e){
+  const r=canvas.getBoundingClientRect();
+  let cx,cy;
+  if(e.touches&&e.touches.length){cx=e.touches[0].clientX;cy=e.touches[0].clientY;}
+  else if(e.changedTouches&&e.changedTouches.length){cx=e.changedTouches[0].clientX;cy=e.changedTouches[0].clientY;}
+  else{cx=e.clientX;cy=e.clientY;}
+  // canvas CSS size == canvas pixel size, so no scaling needed
+  return{x:cx-r.left,y:cy-r.top};
+}
+// Find player at canvas px (with generous hit radius)
+function hit(x,y){
+  return T.players.find(p=>{const c=tc(p.x,p.y);return Math.hypot(c.x-x,c.y-y)<=PR*2})||null;
+}
+
+// ── Draw ──
+function redraw(){
+  cx.clearRect(0,0,PW,PH);
+  drawGrass();
+  T.arrows.forEach(a=>drawArrow(a));
+  if(T.arrowFrom&&T.arrowTo) drawArrow({type:T.mode,...T.arrowFrom,...{x2:T.arrowTo.x,y2:T.arrowTo.y}},0.4);
+  T.players.forEach(drawPlayer);
+}
+
+function drawGrass(){
+  const m=Math.floor(PW*0.04),W=PW-2*m,H=PH-2*m;
+  for(let i=0;i<10;i++){cx.fillStyle=i%2?'#166534':'#14532d';cx.fillRect(m,m+i*H/10,W,H/10)}
+  cx.strokeStyle='rgba(255,255,255,.75)';
+  cx.lineWidth=Math.max(1.5,PW*0.003);
+  const L=(x1,y1,x2,y2)=>{cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke()};
+  cx.strokeRect(m,m,W,H);
+  if(!T.half){L(m,m+H/2,m+W,m+H/2);cx.beginPath();cx.arc(m+W/2,m+H/2,W*.12,0,Math.PI*2);cx.stroke();}
+  const pbW=W*.44,pbH=H*.14,pbX=m+(W-pbW)/2;
+  cx.strokeRect(pbX,m,pbW,pbH);
+  cx.strokeRect(m+(W-W*.20)/2,m,W*.20,H*.055);
+  if(!T.half){cx.strokeRect(pbX,m+H-pbH,pbW,pbH);cx.strokeRect(m+(W-W*.20)/2,m+H-H*.055,W*.20,H*.055);}
+  cx.fillStyle='rgba(255,255,255,.75)';
+  const dot=(x,y)=>{cx.beginPath();cx.arc(x,y,3,0,Math.PI*2);cx.fill()};
+  if(!T.half)dot(m+W/2,m+H/2);dot(m+W/2,m+H*.115);if(!T.half)dot(m+W/2,m+H-H*.115);
+  const gW=W*.12,gH=H*.025;cx.lineWidth*=1.2;
+  cx.strokeRect(m+(W-gW)/2,m-gH,gW,gH);
+  if(!T.half)cx.strokeRect(m+(W-gW)/2,m+H,gW,gH);
+}
+
+function drawArrow(a,alpha=1){
+  const p1=tc(a.x1??a.x,a.y1??a.y),p2=tc(a.x2,a.y2);
+  cx.save();cx.globalAlpha=alpha;
+  const pass=a.type==='pass';
+  cx.strokeStyle=pass?'#facc15':'#38bdf8';
+  cx.lineWidth=Math.max(2,PW*.005);
+  if(!pass)cx.setLineDash([PW*.018,PW*.01]);
+  cx.beginPath();cx.moveTo(p1.x,p1.y);cx.lineTo(p2.x,p2.y);cx.stroke();
+  cx.setLineDash([]);
+  const ang=Math.atan2(p2.y-p1.y,p2.x-p1.x),hl=Math.max(10,PW*.025),ha=.4;
+  cx.fillStyle=pass?'#facc15':'#38bdf8';
+  cx.beginPath();cx.moveTo(p2.x,p2.y);
+  cx.lineTo(p2.x-hl*Math.cos(ang-ha),p2.y-hl*Math.sin(ang-ha));
+  cx.lineTo(p2.x-hl*Math.cos(ang+ha),p2.y-hl*Math.sin(ang+ha));
+  cx.closePath();cx.fill();
+  cx.restore();
+}
+
+function drawPlayer(p){
+  const{x,y}=tc(p.x,p.y);
+  const away=p.team==='away',gk=p.pos==='GK'&&!away;
+  // shadow
+  cx.save();cx.globalAlpha=.25;cx.fillStyle='#000';
+  cx.beginPath();cx.ellipse(x,y+PR*.9,PR*.75,PR*.28,0,0,Math.PI*2);cx.fill();cx.restore();
+  // circle
+  cx.fillStyle=away?'#ef4444':gk?'#f97316':'#f8fafc';
+  cx.beginPath();cx.arc(x,y,PR,0,Math.PI*2);cx.fill();
+  cx.strokeStyle=away?'#7f1d1d':gk?'#7c2d12':'#1e293b';
+  cx.lineWidth=2;cx.stroke();
+  // label
+  cx.fillStyle=away?'#fff':'#0f172a';
+  cx.font=`bold ${Math.round(PR*.72)}px system-ui,sans-serif`;
+  cx.textAlign='center';cx.textBaseline='middle';
+  cx.fillText(T.showPos?p.pos:p.n,x,y+1);
+}
+
+// ── Pointer events ──
+// Use BOTH pointer events (desktop) and touch events (iPad/mobile)
+// Touch events registered with passive:false so we can preventDefault
+
+let usePointer=false;
+
+canvas.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch') return; // let touch events handle it
+  usePointer=true;
+  onDown(e);
+});
+canvas.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch') return;
+  if(usePointer) onMove(e);
+});
+canvas.addEventListener('pointerup',e=>{
+  if(e.pointerType==='touch') return;
+  if(usePointer){onUp(e);usePointer=false;}
+});
+
+canvas.addEventListener('touchstart',e=>{e.preventDefault();onDown(e);},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();onMove(e);},{passive:false});
+canvas.addEventListener('touchend',e=>{e.preventDefault();onUp(e);},{passive:false});
+canvas.addEventListener('touchcancel',e=>{e.preventDefault();T.drag=null;T.arrowFrom=null;T.moved=false;redraw();},{passive:false});
+
+canvas.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const pos=ep(e),p=hit(pos.x,pos.y);
+  if(p) openCtx(p,e.clientX,e.clientY);
+});
+
+function onDown(e){
+  closeCtx();closeEpop();
+  const pos=ep(e);
+  const p=hit(pos.x,pos.y);
+  T.downX=pos.x; T.downY=pos.y; T.moved=false;
+
+  if(T.mode==='select'){
+    if(p){
+      T.drag=p;
+      const c=tc(p.x,p.y);
+      T.dragOX=pos.x-c.x;
+      T.dragOY=pos.y-c.y;
+    }
+  } else if(T.mode==='pass'||T.mode==='run'){
+    const f=tf(pos.x,pos.y);
+    T.arrowFrom={x1:f.x,y1:f.y};
+    T.arrowTo={x:f.x,y:f.y};
+  } else if(T.mode==='opp'){
+    const f=tf(pos.x,pos.y);
+    snap();
+    const n=T.players.filter(p=>p.team==='away').length+1;
+    T.players.push({id:Date.now(),x:f.x,y:f.y,n:String(n),pos:'OP',team:'away'});
+    redraw();
+  }
+}
+
+function onMove(e){
+  const pos=ep(e);
+  const dx=pos.x-T.downX,dy=pos.y-T.downY;
+  if(Math.hypot(dx,dy)>3) T.moved=true;
+
+  if(T.mode==='select'&&T.drag){
+    if(!T.moved) return;
+    const f=tf(pos.x-T.dragOX,pos.y-T.dragOY);
+    T.drag.x=Math.max(.01,Math.min(.99,f.x));
+    T.drag.y=Math.max(.01,Math.min(.99,f.y));
+    redraw();
+  } else if((T.mode==='pass'||T.mode==='run')&&T.arrowFrom){
+    const f=tf(pos.x,pos.y);
+    T.arrowTo={x:f.x,y:f.y};
+    redraw();
+  }
+}
+
+function onUp(e){
+  const pos=ep(e);
+
+  if(T.mode==='select'){
+    if(!T.moved&&!T.drag){
+      // tap on empty space — do nothing
+    } else if(!T.moved&&T.drag){
+      // tap on player — double tap check
+      const now=Date.now();
+      if(now-T.lastTapTime<380&&T.lastTapId===T.drag.id){
+        openEpop(T.drag);
+      }
+      T.lastTapTime=now;
+      T.lastTapId=T.drag.id;
+    } else if(T.moved&&T.drag){
+      // finished drag — snap was already done on first move
+      snap();
+    }
+    T.drag=null;
+    T.moved=false;
+  } else if((T.mode==='pass'||T.mode==='run')&&T.arrowFrom&&T.arrowTo){
+    const dx=(T.arrowTo.x-T.arrowFrom.x1)*PW;
+    const dy=(T.arrowTo.y-T.arrowFrom.y1)*PH;
+    if(Math.hypot(dx,dy)>8){
+      snap();
+      T.arrows.push({type:T.mode,x1:T.arrowFrom.x1,y1:T.arrowFrom.y1,x2:T.arrowTo.x,y2:T.arrowTo.y});
+    }
+    T.arrowFrom=null;T.arrowTo=null;
+    redraw();
+  }
+}
+
+// ── Mode ──
+function setMode(m,btn){
+  T.mode=m;
+  document.querySelectorAll('#mbar .btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const hints={select:'Drag players · Double-tap to edit number · Right-click for options',pass:'Tap and drag to draw a passing arrow (yellow)',run:'Tap and drag to draw a run line (blue dashed)',opp:'Tap the pitch to place an opponent marker'};
+  document.getElementById('mbar-hint').textContent=hints[m];
+}
+
+// ── Formations ──
+function loadFormation(name){
+  if(name==='custom'){snap();T.players=[];T.arrows=[];redraw();return;}
+  const f=FORMS[name];if(!f)return;
+  snap();
+  T.players=f.map(p=>({...p,id:Date.now()+Math.random(),team:'home'}));
+  T.arrows=[];
+  redraw();
+}
+
+// ── Undo ──
+function snap(){
+  T.history.push({players:JSON.parse(JSON.stringify(T.players)),arrows:JSON.parse(JSON.stringify(T.arrows))});
+  if(T.history.length>50)T.history.shift();
+}
+function undo(){
+  if(!T.history.length){toast('Nothing to undo');return;}
+  const s=T.history.pop();T.players=s.players;T.arrows=s.arrows;redraw();
+}
+
+function clearArrows(){snap();T.arrows=[];redraw();toast('Lines cleared');}
+function toggleHalf(){T.half=!T.half;document.getElementById('halfbtn').classList.toggle('on',T.half);resize();}
+function saveImg(){const a=document.createElement('a');a.download='gaffer-tactics.png';a.href=canvas.toDataURL('image/png');a.click();toast('Image saved!');}
+
+// ── Phases ──
+function savePhase(){
+  const name=prompt('Name this phase:','Phase '+(T.phases.length+1));
+  if(!name)return;
+  T.phases.push({name,players:JSON.parse(JSON.stringify(T.players)),arrows:JSON.parse(JSON.stringify(T.arrows))});
+  renderPhases();toast('Phase saved: '+name);
+}
+function renderPhases(){
+  const el=document.getElementById('pchips');
+  el.innerHTML=T.phases.map((ph,i)=>`<span class="pchip" onclick="loadPhase(${i})">${i+1}. ${ph.name} <span style="color:var(--red);margin-left:4px;font-weight:700" onclick="delPhase(event,${i})">×</span></span>`).join('');
+}
+function loadPhase(i){const ph=T.phases[i];T.players=JSON.parse(JSON.stringify(ph.players));T.arrows=JSON.parse(JSON.stringify(ph.arrows));redraw();toast('Loaded: '+ph.name);}
+function delPhase(e,i){e.stopPropagation();T.phases.splice(i,1);renderPhases();}
+
+// ── Context menu ──
+const ctxEl=document.getElementById('ctx');
+function openCtx(p,cx2,cy){
+  T.ctxP=p;ctxEl.classList.add('on');
+  let x=cx2,y=cy;
+  if(x+170>window.innerWidth)x=window.innerWidth-175;
+  if(y+120>window.innerHeight)y=window.innerHeight-125;
+  ctxEl.style.left=x+'px';ctxEl.style.top=y+'px';
+}
+function closeCtx(){ctxEl.classList.remove('on');T.ctxP=null;}
+function ctxEdit(){if(!T.ctxP)return;openEpop(T.ctxP);closeCtx();}
+function ctxSwitch(){if(!T.ctxP)return;snap();T.ctxP.team=T.ctxP.team==='home'?'away':'home';closeCtx();redraw();}
+function ctxRemove(){if(!T.ctxP)return;snap();T.players=T.players.filter(p=>p.id!==T.ctxP.id);closeCtx();redraw();}
+document.addEventListener('pointerdown',e=>{if(!ctxEl.contains(e.target)&&e.target!==canvas)closeCtx();});
+
+// ── Edit popup ──
+const epopEl=document.getElementById('epop');
+const epopIn=document.getElementById('epop-in');
+function openEpop(p){T.epopP=p;epopIn.value=p.n;epopEl.classList.add('on');setTimeout(()=>{epopIn.focus();epopIn.select();},50);}
+function closeEpop(){epopEl.classList.remove('on');T.epopP=null;}
+function saveEpop(){if(!T.epopP)return;const v=epopIn.value.trim().slice(0,12);if(v){snap();T.epopP.n=v;redraw();}closeEpop();}
+epopIn.addEventListener('keydown',e=>{if(e.key==='Enter')saveEpop();if(e.key==='Escape')closeEpop();});
+
+// ── Toast ──
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2800);}
+
+// ── AI ──
+const WORKER='https://gaffer-proxy.abhigyan-singhal.workers.dev/';
+
+async function callAI(prompt){
+  try{
+    const r=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    return d.content?.find(b=>b.type==='text')?.text||'No response received.';
+  }catch(e){return'Error reaching AI. Check internet connection.';}
+}
+
+function renderAI(elId,text){
+  document.getElementById(elId).innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+function boardState(){
+  const home=T.players.filter(p=>p.team==='home');
+  const away=T.players.filter(p=>p.team==='away');
+  const defs=home.filter(p=>p.y>0.65&&p.pos!=='GK').length;
+  const mids=home.filter(p=>p.y>0.40&&p.y<=0.65).length;
+  const fwds=home.filter(p=>p.y<=0.40).length;
+  const xs=home.map(p=>p.x);
+  const width=xs.length>1?(Math.max(...xs)-Math.min(...xs)).toFixed(2):0;
+  const highLine=home.filter(p=>p.y<0.42&&p.pos!=='GK').length>3;
+  return`Shape: ${defs}-${mids}-${fwds} (${home.length} outfield players). Width: ${width>0.7?'very wide':width<0.4?'narrow':'balanced'}. ${highLine?'High defensive/midfield line.':''} ${away.length} opponent markers placed. ${T.arrows.length} movement arrows drawn.`;
+}
+
+async function aiDo(type){
+  const el=document.getElementById('aip-body');
+  el.innerHTML='<em>Analysing the board...</em>';
+  const bs=boardState();
+  const p={
+    analyse:`You are an elite football tactics analyst. Analyse this EXACT board state: ${bs}\n\nGive specific, dynamic analysis:\n1. What this actual shape is designed to do\n2. Specific gaps and vulnerabilities RIGHT NOW (e.g. which zones are exposed)\n3. How an opponent can exploit these specific weaknesses\n4. One immediate tactical adjustment to improve the shape\n\nBe specific to what's on the board, not generic. Max 220 words.`,
+    drills:`Football coach educator. Board state: ${bs}\n\nSuggest 3 training drills for THIS specific shape. For each: name, one-sentence setup, what tactical problem it solves for this shape, duration. Cones and balls only. Max 200 words.`,
+    teamtalk:`You are a passionate coach. Write a pre-match team talk for this shape: ${bs}\n\nMention actual positions and specific responsibilities. Motivational and clear. Max 160 words.`,
+    setpiece:`Set piece specialist. Design 2 routines (1 corner, 1 free kick) for this shape: ${bs}\n\nBase them on the actual player positions. 3 simple steps each that amateurs can remember. Max 200 words.`
+  };
+  const text=await callAI(p[type]);
+  renderAI('aip-body',text);
+}
+
+async function aiAsk(){
+  const q=document.getElementById('aiQ').value.trim();
+  if(!q)return;
+  document.getElementById('aiQ').value='';
+  const el=document.getElementById('aip-body');
+  el.innerHTML='<em>Thinking...</em>';
+  const text=await callAI(`Football tactics coach. Board state: ${boardState()}. Answer specifically about this board: "${q}" Max 180 words.`);
+  renderAI('aip-body',text);
+}
+
+// ═══════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  el.classList.add('on');
+  closeNav();
+  if(id==='tactics')setTimeout(resize,60);
+  if(id==='squad')renderSquad();
+  if(id==='dev')renderDev();
+  if(id==='audience')loadAudience();
+}
+function toggleNav(){document.getElementById('nav').classList.toggle('on');document.getElementById('overlay').classList.toggle('on');}
+function closeNav(){document.getElementById('nav').classList.remove('on');document.getElementById('overlay').classList.remove('on');}
+
+// ═══════════════════════════════════════════
+// SQUAD
+// ═══════════════════════════════════════════
+let squad=[
+  {id:1,name:'Arjun Kumar',n:'1',pos:'GK',avail:'fit',notes:'Strong shot-stopper'},
+  {id:2,name:'Rahul Singh',n:'2',pos:'RB',avail:'fit',notes:'Good overlap'},
+  {id:3,name:'Vikram Patel',n:'5',pos:'CB',avail:'fit',notes:'Strong in the air'},
+  {id:4,name:'Suresh Nair',n:'6',pos:'CB',avail:'doubt',notes:'Hamstring concern'},
+  {id:5,name:'Dev Sharma',n:'3',pos:'LB',avail:'fit',notes:''},
+  {id:6,name:'Karan Mehta',n:'4',pos:'CM',avail:'fit',notes:'Good engine'},
+  {id:7,name:'Ravi Verma',n:'8',pos:'CM',avail:'out',notes:'Knee - 2 weeks'},
+  {id:8,name:'Arun Das',n:'11',pos:'LW',avail:'fit',notes:'Pacey winger'},
+  {id:9,name:'Mohan Reddy',n:'7',pos:'RW',avail:'fit',notes:'Good crosser'},
+  {id:10,name:'Preet Joshi',n:'10',pos:'CAM',avail:'fit',notes:'Creative'},
+  {id:11,name:'Sanjay Pillai',n:'9',pos:'ST',avail:'fit',notes:'Strong finisher'},
+];
+let sqFilter='all';
+
+function renderSquad(){
+  const list=squad.filter(p=>sqFilter==='all'||p.avail===sqFilter);
+  const cols={fit:'#166534',doubt:'#78350f',out:'#7f1d1d'};
+  const tcols={fit:'#86efac',doubt:'#fde047',out:'#fca5a5'};
+  const badges={fit:'<span class="badge bg">Fit</span>',doubt:'<span class="badge by">Doubt</span>',out:'<span class="badge br">Out</span>'};
+  document.getElementById('sq-grid').innerHTML=list.map(p=>`
+    <div class="sq-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="sq-num" style="background:${cols[p.avail]}33;color:${tcols[p.avail]}">${p.n}</div>
+        <div><div style="font-size:14px;font-weight:600">${p.name}</div><div style="font-size:12px;color:var(--muted)">${p.pos}</div></div>
+      </div>
+      ${badges[p.avail]}
+      ${p.notes?`<div style="font-size:12px;color:var(--muted);margin-top:6px">${p.notes}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn sm" onclick="cycleAvail(${p.id})">Availability</button>
+        <button class="btn sm" onclick="editNote(${p.id})">Note</button>
+        <button class="btn sm danger" onclick="removePlayer(${p.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function filterSq(f,el){sqFilter=f;el.parentElement.querySelectorAll('.tag').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderSquad();}
+function cycleAvail(id){const p=squad.find(p=>p.id===id);if(!p)return;const c={fit:'doubt',doubt:'out',out:'fit'};p.avail=c[p.avail];renderSquad();}
+function editNote(id){const p=squad.find(p=>p.id===id);if(!p)return;const n=prompt('Note for '+p.name+':',p.notes||'');if(n!==null){p.notes=n;renderSquad();}}
+function removePlayer(id){if(!confirm('Remove player?'))return;squad=squad.filter(p=>p.id!==id);renderSquad();}
+function addPlayer(){
+  const name=prompt('Player name:');if(!name)return;
+  const n=prompt('Shirt number:','');
+  const pos=prompt('Position:','CM');
+  squad.push({id:Date.now(),name,n:n||'?',pos:(pos||'CM').toUpperCase(),avail:'fit',notes:''});
+  renderSquad();
+}
+async function aiLineup(){
+  document.getElementById('sq-ai').innerHTML='<em>Generating lineup...</em>';
+  const fit=squad.filter(p=>p.avail==='fit').map(p=>`${p.name} (${p.pos})`).join(', ');
+  const doubt=squad.filter(p=>p.avail==='doubt').map(p=>p.name).join(', ');
+  const text=await callAI(`Football coach. Available players: ${fit}. Doubt: ${doubt||'none'}. Suggest best starting 11 and formation. Brief rationale for each position. Max 250 words.`);
+  renderAI('sq-ai',text);
+}
+
+// ═══════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════
+let drills=[];
+const dtypes={wu:'Warm-up',te:'Technical',ta:'Tactical',ga:'Small-sided game',re:'Cooldown'};
+const dcolors={wu:'wu',te:'te',ta:'ta',ga:'ga',re:'re'};
+
+function addDrill(){
+  const name=document.getElementById('dname').value.trim();
+  if(!name){toast('Enter a drill name');return;}
+  drills.push({type:document.getElementById('dtype').value,name,dur:parseInt(document.getElementById('ddur').value)||15,notes:document.getElementById('dnotes').value.trim()});
+  document.getElementById('dname').value='';document.getElementById('dnotes').value='';
+  renderDrills();
+}
+function renderDrills(){
+  const el=document.getElementById('drills-list');
+  if(!drills.length){el.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px">No drills added yet.</div>';return;}
+  const total=drills.reduce((s,d)=>s+d.dur,0);
+  el.innerHTML=`<div style="padding:6px 0;font-size:12px;color:var(--muted)">Total: <strong style="color:var(--text)">${total} mins</strong></div>`+
+  drills.map((d,i)=>`<div class="sb ${dcolors[d.type]}" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:3px;color:var(--muted)">${dtypes[d.type]}</div><div style="font-size:14px;font-weight:600">${d.name}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${d.dur} mins${d.notes?' · '+d.notes:''}</div></div><button class="btn sm danger" onclick="drills.splice(${i},1);renderDrills()">×</button></div></div>`).join('');
+}
+async function aiSession(){
+  document.getElementById('ses-ai').innerHTML='<em>Building session plan...</em>';
+  const text=await callAI(`Football coach educator. Create a complete ${document.getElementById('sdur').value}-minute training session for grassroots team with ${document.getElementById('splayers').value} players. Focus: ${document.getElementById('sfocus').value}. Include warm-up, 2-3 main drills with setup, small-sided game, cooldown. Cones and balls only. Max 300 words.`);
+  renderAI('ses-ai',text);
+}
+
+// ═══════════════════════════════════════════
+// MATCH LOG
+// ═══════════════════════════════════════════
+let events=[],scoreH=0,scoreA=0;
+function newMatch(){
+  const h=prompt('Your team name:','My Team');
+  const a=prompt('Opponent:','Opponents');
+  if(h)document.getElementById('mhome').textContent=h;
+  if(a)document.getElementById('maway').textContent=a;
+  events=[];scoreH=0;scoreA=0;
+  document.getElementById('sh').textContent='0';document.getElementById('sa').textContent='0';
+  document.getElementById('evlist').innerHTML='';document.getElementById('mstat').textContent='In progress';
+}
+function logEv(icon,type,isHome){
+  const min=document.getElementById('mmin').value||'?';
+  const player=document.getElementById('mplayer').value.trim();
+  if(isHome===true){scoreH++;document.getElementById('sh').textContent=scoreH;}
+  if(isHome===false){scoreA++;document.getElementById('sa').textContent=scoreA;}
+  events.push({min,icon,desc:player?`${type} — ${player}`:type});
+  document.getElementById('evlist').innerHTML=events.map(e=>`<div class="ev"><span class="et">${e.min}'</span><span style="font-size:16px">${e.icon}</span><span>${e.desc}</span></div>`).join('');
+  const m=parseInt(min);if(!isNaN(m))document.getElementById('mmin').value=Math.min(m+1,120);
+}
+async function aiMatch(){
+  document.getElementById('match-ai').innerHTML='<em>Analysing match...</em>';
+  const evs=events.map(e=>`${e.min}' ${e.icon} ${e.desc}`).join(', ');
+  const text=await callAI(`Football analyst. Post-match summary. Score: ${document.getElementById('mhome').textContent} ${scoreH} - ${scoreA} ${document.getElementById('maway').textContent}. Events: ${evs||'none logged'}. Cover performance, key moments, improvement areas, tactical suggestion for next match. Max 200 words.`);
+  renderAI('match-ai',text);
+}
+
+// ═══════════════════════════════════════════
+// SCOUTING
+// ═══════════════════════════════════════════
+let watchlist=[];
+async function aiScout(){
+  document.getElementById('scout-ai').innerHTML='<em>Building scout report...</em>';
+  const text=await callAI(`Football scout. Analyse opponent and give game plan.\nTeam: ${document.getElementById('oname').value||'opponent'}\nFormation: ${document.getElementById('oform').value}\nStyle: ${document.getElementById('ostyle').value}\nStrengths: ${document.getElementById('ostr').value||'unknown'}\nWeaknesses: ${document.getElementById('oweak').value||'unknown'}\nDanger players: ${document.getElementById('odanger').value||'none'}\n\nProvide: 1) Threat assessment 2) How to exploit weaknesses 3) How to neutralise strengths 4) Recommended approach 5) 2 key tactical instructions. Max 300 words.`);
+  renderAI('scout-ai',text);
+}
+function addWatch(){const n=document.getElementById('wname').value.trim();if(!n)return;watchlist.push(n);document.getElementById('wname').value='';renderWatch();}
+function renderWatch(){document.getElementById('watchlist').innerHTML=watchlist.map((w,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:13px">${w}<button class="btn sm danger" onclick="watchlist.splice(${i},1);renderWatch()">×</button></div>`).join('')||'<div style="font-size:12px;color:var(--muted)">No players on watchlist.</div>';}
+
+// ═══════════════════════════════════════════
+// PLAYER DEVELOPMENT
+// ═══════════════════════════════════════════
+const SKILLS=['Passing','Shooting','Dribbling','Defending','Heading','Positioning','Speed','Stamina','Leadership','Tactical awareness'];
+let devData={},devSel=null;
+
+function renderDev(){
+  const tabs=document.getElementById('dev-tabs');
+  tabs.innerHTML=squad.map(p=>`<button class="tag${devSel===p.id?' on':''}" onclick="selDev(${p.id})">${p.name}</button>`).join('');
+  if(!devSel&&squad.length)selDev(squad[0].id);
+}
+function selDev(id){
+  devSel=id;
+  if(!devData[id])devData[id]={ratings:{},notes:''};
+  const d=devData[id];
+  document.querySelectorAll('#dev-tabs .tag').forEach(t=>{
+    const m=t.getAttribute('onclick').match(/\d+/);
+    if(m)t.classList.toggle('on',parseInt(m[0])===id);
+  });
+  document.getElementById('dev-ratings').innerHTML=SKILLS.map(s=>{
+    const v=d.ratings[s]||0;
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="font-size:13px;min-width:130px">${s}</div><div class="stars">${[1,2,3,4,5].map(n=>`<span class="star" onclick="setRating('${s}',${n},${id})" style="cursor:pointer">${n<=v?'★':'☆'}</span>`).join('')}</div></div>`;
+  }).join('');
+  document.getElementById('dev-notes').value=d.notes||'';
+  document.getElementById('dev-ai').innerHTML='<em>Save notes and tap "AI feedback"...</em>';
+}
+function setRating(skill,val,id){if(!devData[id])devData[id]={ratings:{},notes:''};devData[id].ratings[skill]=val;selDev(id);}
+function saveDev(){if(!devSel)return;devData[devSel].notes=document.getElementById('dev-notes').value;toast('Notes saved');}
+async function aiDev(){
+  if(!devSel){toast('Select a player first');return;}
+  document.getElementById('dev-ai').innerHTML='<em>Generating development plan...</em>';
+  const p=squad.find(p=>p.id===devSel);
+  const d=devData[devSel]||{ratings:{},notes:''};
+  const ratings=Object.entries(d.ratings).map(([k,v])=>`${k}:${v}/5`).join(', ')||'none yet';
+  const text=await callAI(`Football development coach. Personalised plan for:\nName: ${p?.name}\nPosition: ${p?.pos}\nRatings: ${ratings}\nNotes: ${d.notes||'none'}\n\nProvide: 1) Top 2 strengths 2) Top 2 areas to improve 3) 3 specific training exercises for weaknesses 4) 3-month goal. Encouraging and practical. Max 250 words.`);
+  renderAI('dev-ai',text);
+}
+
+// ═══════════════════════════════════════════
+// AUDIENCE
+// ═══════════════════════════════════════════
+function switchAud(tab,el){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.apane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('ap-'+tab).classList.add('on');
+}
+async function loadAudience(){
+  const f=document.getElementById('aud-form').value;
+  document.getElementById('aud-coach').innerHTML='<em>Loading...</em>';
+  document.getElementById('aud-parent').innerHTML='<em>Loading...</em>';
+  const [ct,pt]=await Promise.all([
+    callAI(`Football expert. Comprehensive tactical breakdown of ${f} formation: shape in all 4 phases, roles per position, key triggers, how to set it up in training. For an experienced grassroots coach. Max 280 words.`),
+    callAI(`Explain the ${f} football formation to a parent who doesn't follow football. Very simple language, no jargon. What the team looks like, what each group does, what to watch for. Friendly tone. Max 130 words.`)
+  ]);
+  renderAI('aud-coach',ct);
+  renderAI('aud-parent',pt);
+  // Position buttons
+  const form=FORMS[f];
+  if(form){
+    const positions=[...new Set(form.map(p=>p.p))];
+    document.getElementById('aud-pos-btns').innerHTML=positions.map(pos=>`<button class="tag" onclick="loadPosView('${pos}','${f}',this)">${pos}</button>`).join('');
+  }
+}
+async function loadPosView(pos,f,el){
+  el.parentElement.querySelectorAll('.tag').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  document.getElementById('aud-player').innerHTML='<em>Loading your role...</em>';
+  const text=await callAI(`Football coach talking directly to a player. In ${f} formation, explain the ${pos} role in simple motivating language. Where to position, when to press, key responsibility, one thing to always remember. Second person, encouraging. Max 120 words.`);
+  renderAI('aud-player',text);
+}
+async function aiParent(type){
+  const f=document.getElementById('aud-form').value;
+  document.getElementById('aud-parent').innerHTML='<em>Loading...</em>';
+  const prompts={watch:`Tell a football parent watching a ${f} formation: what specific things show the team executing their tactics well. Very simple language. Max 100 words.`,child:`A parent wants to know what their child does in ${f}. Explain in very simple terms — when they get the ball, where they run, how they help. Warm and reassuring. Max 100 words.`};
+  const text=await callAI(prompts[type]);
+  renderAI('aud-parent',text);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('resize',()=>{if(document.getElementById('page-tactics').classList.contains('on'))resize();});
+renderSquad();
+renderDrills();
+renderWatch();
+setTimeout(()=>{resize();loadFormation('4-3-3');toast('Welcome to Gaffer · Select a formation to get started');},100);
+</script>
+</body>
+</html>
