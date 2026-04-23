@@ -880,54 +880,100 @@ canvas.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
 canvas.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
 function onDown(e){
+  e.preventDefault();
   canvas.setPointerCapture(e.pointerId);
   closeCtx();closeEdit();
-  const pos=evP(e),hit=hitP(pos.x,pos.y);
+  const pos=evP(e);
+  const hit=hitP(pos.x,pos.y);
   APP.didDrag=false;
-  if(APP.mode==='select'&&hit){
-    APP.longFired=false;
-    APP.longTimer=setTimeout(()=>{APP.longFired=true;openCtxFromPlayer(hit)},600);
-    APP.dragging=hit.id;
-    const c=toC(hit.x,hit.y);
-    APP.dragOffset={x:pos.x-c.x,y:pos.y-c.y};
+  APP.downPos={x:pos.x,y:pos.y};
+
+  if(APP.mode==='select'){
+    if(hit){
+      APP.dragging=hit.id;
+      const c=toC(hit.x,hit.y);
+      APP.dragOffset={x:pos.x-c.x,y:pos.y-c.y};
+      APP.longFired=false;
+      APP.longTimer=setTimeout(()=>{
+        if(!APP.didDrag){
+          APP.longFired=true;
+          APP.dragging=null;
+          openCtxFromPlayer(hit);
+        }
+      },600);
+    }
   } else if(APP.mode==='pass'||APP.mode==='run'){
-    const f=toF(pos.x,pos.y);APP.arrowStart=f;APP.arrowPrev=f;
+    const f=toF(pos.x,pos.y);
+    APP.arrowStart=f;
+    APP.arrowPrev=f;
   } else if(APP.mode==='opponent'){
-    const f=toF(pos.x,pos.y);snap();
+    const f=toF(pos.x,pos.y);
+    snap();
     const n=APP.players.filter(p=>p.team==='away').length+1;
     APP.players.push({id:uid(),x:f.x,y:f.y,num:String(n),pos:'OP',team:'away'});
     drawPitch();
   }
 }
+
 function onMove(e){
+  e.preventDefault();
   const pos=evP(e);
+
   if(APP.mode==='select'&&APP.dragging!==null){
-    clearTimeout(APP.longTimer);
-    if(!APP.didDrag){APP.didDrag=true;snap();}
-    const p=APP.players.find(p=>p.id===APP.dragging);
-    if(p){const f=toF(pos.x-APP.dragOffset.x,pos.y-APP.dragOffset.y);p.x=Math.max(.01,Math.min(.99,f.x));p.y=Math.max(.01,Math.min(.99,f.y));drawPitch();}
+    const dx=pos.x-(APP.downPos?APP.downPos.x:pos.x);
+    const dy=pos.y-(APP.downPos?APP.downPos.y:pos.y);
+    if(!APP.didDrag&&Math.hypot(dx,dy)>4){
+      APP.didDrag=true;
+      clearTimeout(APP.longTimer);
+      snap();
+    }
+    if(APP.didDrag){
+      const p=APP.players.find(p=>p.id===APP.dragging);
+      if(p){
+        const f=toF(pos.x-APP.dragOffset.x,pos.y-APP.dragOffset.y);
+        p.x=Math.max(.01,Math.min(.99,f.x));
+        p.y=Math.max(.01,Math.min(.99,f.y));
+        drawPitch();
+      }
+    }
   } else if((APP.mode==='pass'||APP.mode==='run')&&APP.arrowStart){
-    APP.arrowPrev=toF(pos.x,pos.y);drawPitch();
+    APP.arrowPrev=toF(pos.x,pos.y);
+    drawPitch();
   }
 }
+
 function onUp(e){
+  e.preventDefault();
   clearTimeout(APP.longTimer);
-  if(APP.longFired){APP.longFired=false;APP.dragging=null;APP.arrowStart=null;return}
+
   if(APP.mode==='select'){
-    const pos=evP(e),hit=hitP(pos.x,pos.y);
-    if(hit){
-      const now=Date.now();
-      if(now-APP.lastTap<350&&APP.lastTapId===hit.id) openEdit(hit);
-      APP.lastTap=now;APP.lastTapId=hit.id;
+    if(!APP.didDrag&&!APP.longFired){
+      const pos=evP(e);
+      const hit=hitP(pos.x,pos.y);
+      if(hit){
+        const now=Date.now();
+        if(now-APP.lastTap<400&&APP.lastTapId===hit.id){
+          openEdit(hit);
+        }
+        APP.lastTap=now;
+        APP.lastTapId=hit.id;
+      }
     }
     APP.dragging=null;
+    APP.didDrag=false;
+    APP.longFired=false;
   } else if((APP.mode==='pass'||APP.mode==='run')&&APP.arrowStart){
     if(APP.arrowPrev){
       const dx=Math.abs(APP.arrowPrev.x-APP.arrowStart.x)*PW;
       const dy=Math.abs(APP.arrowPrev.y-APP.arrowStart.y)*PH;
-      if(Math.hypot(dx,dy)>10){snap();APP.arrows.push({type:APP.mode,x1:APP.arrowStart.x,y1:APP.arrowStart.y,x2:APP.arrowPrev.x,y2:APP.arrowPrev.y});}
+      if(Math.hypot(dx,dy)>8){
+        snap();
+        APP.arrows.push({type:APP.mode,x1:APP.arrowStart.x,y1:APP.arrowStart.y,x2:APP.arrowPrev.x,y2:APP.arrowPrev.y});
+      }
     }
-    APP.arrowStart=null;APP.arrowPrev=null;drawPitch();
+    APP.arrowStart=null;
+    APP.arrowPrev=null;
+    drawPitch();
   }
 }
 canvas.addEventListener('contextmenu',e=>{e.preventDefault();const pos=evP(e),hit=hitP(pos.x,pos.y);if(hit)openCtxAt(hit,e.clientX,e.clientY)});
